@@ -1,0 +1,11 @@
+{
+  "id": "maple.acp",
+  "name": "Maple",
+  "apiVersion": 1,
+  "description": "Run Maple beside Buzz on this computer through ACP.",
+  "host": {
+    "processes": [{"id": "maple", "program": "maple-agent", "args": ["acp"]}],
+    "mcp": true,
+    "files": true
+  }
+}
