@@ -1,74 +1,90 @@
 # Maple for Buzz
 
-A dependency-free harness plugin for stock Buzz desktop 1.0.0. It runs the
-installed `maple-agent acp` **on the computer running Buzz**, exposes Buzz tools
-over local HTTP MCP, and keeps one Maple task per Buzz conversation. Run both
-applications on an always-on remote desktop if that is where your agent lives.
-No Builderlab account, client fork or relay fork is required by the design.
+Use [Maple Work](https://maple.ai/work) as an agent in [Buzz](https://github.com/block/buzz-app).
+Mention your agent in a conversation; Maple works in your chosen folder and
+replies in the Buzz thread.
 
-Status: working PoC. Native installation, enablement, agent creation,
-authenticated replies and follow-up conversation have been checked in stock
-Buzz 1.0.0 on Linux with Maple Work 0.0.23 build 950. A conversation session and
-context cursor were persisted. Protocol fixtures cover additional lifecycle
-cases; active-turn steering, cancellation and restart recovery still need live
-checks. Buzz's public harness API is preview. Record and test compatible
-client/plugin versions before upgrading.
+**Experimental PoC.** Basic replies and follow-up conversations work. The plugin
+is still being tested, and Buzz's harness API is preview. It is not yet a stable,
+fully stress-tested integration.
 
-## Install
+## Quick start
 
-1. Install Buzz desktop and Maple Work on the execution computer. Sign Maple in
-   using its own supported flow and confirm `maple-agent` is on Buzz's PATH.
-2. Create the working directory you want the agent to use. Default:
-   `~/workspaces/buzz`.
-3. In Buzz Settings → Plugins → Manage plugins, install the `dist` folder,
-   review its process/MCP/file permissions, and enable **Maple**.
-4. Create an agent with the Maple harness. Set its directory, optional model ID
-   and instructions, then add it to the desired conversation.
+1. Install Buzz desktop and Maple Work **on the same computer**, and sign in to
+   both. Ensure `maple-agent` is available on the PATH used by Buzz.
+2. In Buzz, open **Settings → Plugins → Manage plugins → Add**.
+3. Enter this repository URL and leave **Branch or tag** blank:
 
-The owner and same-owner attested agents can invoke it through the standard
-Buzz harness gate. Other people can contribute in a shared thread; the owner
-can mention the agent to act on their contributions. The agent sees the thread
-context that Buzz supplies. This plugin does not broaden invocation policy.
+   ```text
+   https://github.com/MaplePrivacyLabs/buzz-maple-plugin
+   ```
 
-The model field must match an ID Maple advertises. Blank preserves Maple's
-selected default. The plugin checks HTTP MCP capabilities and confirms an
-explicit model selection. It passes Buzz instructions in the initial user input
-without replacing Maple's system prompt. Visible replies use Buzz's MCP tools;
-streamed assistant text is not automatically reposted.
+4. Click **Find**. Buzz discovers the built Maple plugin in `dist`. Review its
+   process/MCP/file permissions, choose **Install plugin**, and enable **Maple**.
+5. Create an agent and select the **Maple** harness. Choose an existing project
+   folder; leave **Model ID** blank to use Maple's default. Add the agent to a
+   channel, then select its mention and send a message.
 
-## Sessions and lifecycle
+For a first check, ask: **“Please run `pwd` and reply in this thread with your
+working directory.”** No build step, Node installation or extra hosting account
+is needed to install the committed plugin.
 
-Session IDs, context cursors and configuration are saved in Buzz's native agent
-storage. MCP bearer credentials are kept in memory and are reattached through
-`session/load` after restart. A failed restore is reported, not silently replaced
-with an empty task. **Reset conversation sessions** starts fresh Buzz sessions
-without deleting saved Maple tasks; stop active work first.
+Buzz and Maple can also run together on an always-on remote desktop. The plugin
+runs Maple on that computer; other people use their own Buzz clients to chat
+with the agent. Installing the plugin on a laptop runs Maple on that laptop.
 
-Follow-ups use Maple's negotiated `_session/steering` extension. If the turn
-finished during steering, the explicit `promptRequired` contract gives ownership
-of the next prompt to this plugin. Stop/unload sends `session/cancel` before
-closing owned processes/tool servers. Closing ACP alone would only detach it
-from Maple's shared host, so cancellation is explicit.
+## Requirements and limits
 
-The processes have the normal OS user's access. Working directories, personas
-and instructions do not themselves isolate filesystem or credentials. Set up
-resource access on the execution computer as appropriate for your agents.
+- Checked with **Buzz desktop 1.0.0** and **Maple Work 0.0.23 build 950** on Linux.
+  Other versions/platforms have not yet been validated for this plugin.
+- Maple must be signed in and its local store unlocked. In Maple Work,
+  **Settings → ACP** shows the command for the installed executable. Buzz
+  launches `maple-agent acp`; its directory must be on Buzz's PATH. Restart Buzz
+  after changing that environment.
+- The agent's owner can invoke it. Teammates can contribute in the thread, and
+  the owner can mention the agent to act on their input. This uses Buzz's normal
+  owner-admission policy.
+- Maple has the execution user's normal filesystem and tool access. The plugin
+  can start Maple, provide Buzz tools and read files for it. A chosen working
+  directory or a separate agent persona does not create an access boundary.
+- Real replies, follow-ups and persisted conversation state have been checked.
+  Active-turn steering, cancellation and recovery after restart have protocol
+  fixture coverage but still need live stress testing.
+
+If an agent does not respond, first check its channel membership, Maple sign-in,
+working directory and whether Buzz can find `maple-agent`. An explicit model ID
+must be one Maple advertises; leaving it blank is the simplest starting point.
+
+## Sessions
+
+The plugin keeps one Maple task per Buzz conversation and saves its session ID
+and context cursor in Buzz's native agent storage. Temporary HTTP MCP bearer
+credentials stay in memory and are reattached when a session is loaded.
+Maple sends visible replies through Buzz's tools.
+
+Agent settings include the working directory, optional model and instructions.
+**Reset conversation sessions** starts fresh Buzz bindings without deleting
+saved Maple tasks. Stop active work before resetting or changing configuration.
 
 ## Development
 
-No npm packages are installed or bundled. The Nix input is pinned to the same
-reviewed nixpkgs revision used by Maple Agent's component shell.
+The runtime has no third-party JavaScript dependencies. The committed
+`dist/manifest.json` and `dist/plugin.js` are the installation artifacts; the
+builder concatenates the two local source modules.
 
 ```sh
 nix develop --no-update-lock-file -c node --test
 nix develop --no-update-lock-file -c node scripts/build.mjs
 ```
 
-`dist/manifest.json` and `dist/plugin.js` are committed installation artifacts.
-The builder concatenates the two local source modules. Tests use scripted ACP
-processes, not provider accounts or real inference. They cover HTTP MCP,
-selection, session restoration, steering races, refusals and cleanup.
+The pinned Nix shell supplies Node 24. Tests use scripted ACP processes rather
+than real accounts or model calls. They cover protocol framing, HTTP MCP,
+model selection, session loading, steering races, refusals and cleanup.
 
-Public contracts reviewed: [Buzz v1.0.0 plugin API](https://github.com/block/buzz-app/blob/v1.0.0/docs/plugin-architecture.md),
-[public harness kit](https://github.com/block/buzz-app/blob/v1.0.0/src/features/agent-harness/kit.ts),
+Public API references: [Buzz plugin API](https://github.com/block/buzz-app/blob/v1.0.0/docs/plugin-architecture.md),
+[Buzz harness kit](https://github.com/block/buzz-app/blob/v1.0.0/src/features/agent-harness/kit.ts),
 [Maple ACP](https://github.com/MaplePrivacyLabs/Maple/tree/c5f1120a6facf0a6069cb8e592b8d23e27067d4e/apps/maple-agent).
+
+## License
+
+[MIT](LICENSE).
