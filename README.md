@@ -6,8 +6,10 @@ over local HTTP MCP, and keeps one Maple task per Buzz conversation. Run both
 applications on an always-on remote desktop if that is where your agent lives.
 No Builderlab account, client fork or relay fork is required by the design.
 
-Status: PoC under development. Protocol fixtures pass; live authenticated Buzz
-and Maple acceptance is pending. Buzz's public harness API is preview. Record
+Status: PoC under development. Protocol fixtures pass. Native installation,
+enablement and agent creation have been checked in stock Buzz 1.0.0 on Linux;
+authenticated Maple inference and shared-thread acceptance are pending. Buzz's
+public harness API is preview. Record
 and test compatible client/plugin versions before upgrading.
 
 ## Install
