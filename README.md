@@ -35,7 +35,7 @@ with the agent. Installing the plugin on a laptop runs Maple on that laptop.
 
 ## Requirements and limits
 
-- Checked with **Buzz desktop 1.0.0** and **Maple Work 0.0.23 build 950** on Linux.
+- Checked with **Buzz desktop 1.0.0 and 1.0.1** and **Maple Work 0.0.23 build 950** on Linux.
   Other versions/platforms have not yet been validated for this plugin.
 - Maple must be signed in and its local store unlocked. In Maple Work,
   **Settings → ACP** shows the command for the installed executable. Buzz
@@ -47,9 +47,11 @@ with the agent. Installing the plugin on a laptop runs Maple on that laptop.
 - Maple has the execution user's normal filesystem and tool access. The plugin
   can start Maple, provide Buzz tools and read files for it. A chosen working
   directory or a separate agent persona does not create an access boundary.
-- Real replies, follow-ups and persisted conversation state have been checked.
-  Active-turn steering, cancellation and recovery after restart have protocol
-  fixture coverage but still need live stress testing.
+- The 1.0.1 smoke check covered an existing thread after a Buzz restart, a fresh
+  thread, shell execution, attachment upload/download, Stop during a bounded
+  shell task and a successful follow-up. These checks used the existing plugin
+  implementation. Active-turn steering, unplanned crash/reboot recovery and
+  cancellation of other tool types still need live stress testing.
 
 If an agent does not respond, first check its channel membership, Maple sign-in,
 working directory and whether Buzz can find `maple-agent`. An explicit model ID
@@ -65,6 +67,10 @@ Maple sends visible replies through Buzz's tools.
 Agent settings include the working directory, optional model and instructions.
 **Reset conversation sessions** starts fresh Buzz bindings without deleting
 saved Maple tasks. Stop active work before resetting or changing configuration.
+
+Base instructions and core memory are supplied when a session is first primed.
+Existing sessions do not automatically gain Buzz's native prompt/memory refresh
+behavior. Changing the plugin's configured instructions starts a new session.
 
 ## Development
 
