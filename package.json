@@ -1,0 +1,9 @@
+{
+  "name": "buzz-maple-plugin",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=24"},
+  "scripts": {"build": "node scripts/build.mjs", "test": "node --test"}
+}
