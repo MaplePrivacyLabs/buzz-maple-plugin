@@ -37,6 +37,11 @@ with the agent. Installing the plugin on a laptop runs Maple on that laptop.
 
 - Checked with **Buzz desktop 1.0.0 and 1.0.1** and **Maple Work 0.0.23 build 950** on Linux.
   Other versions/platforms have not yet been validated for this plugin.
+- A Linux desktop upgrade to **Buzz 1.0.3** retained the enabled Maple plugin
+  registration and unchanged module. All 11 protocol/lifecycle fixtures pass,
+  and the reviewed public harness API requires no plugin change. Fresh inference,
+  attachment and Stop checks were not repeated on 1.0.3; the full live workflow
+  check below remains specific to 1.0.1.
 - Maple must be signed in and its local store unlocked. In Maple Work,
   **Settings → ACP** shows the command for the installed executable. Buzz
   launches `maple-agent acp`; its directory must be on Buzz's PATH. Restart Buzz
