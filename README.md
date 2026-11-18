@@ -11,7 +11,20 @@ fully stress-tested integration.
 ## Quick start
 
 1. Install Buzz desktop and Maple Work **on the same computer**, and sign in to
-   both. Ensure `maple-agent` is available on the PATH used by Buzz.
+   both. Ensure `maple-agent` is available on the PATH used by Buzz. On macOS,
+   if `which maple-agent` prints nothing in Terminal, run:
+
+   ```sh
+   if [ -x "/Applications/Maple Agent.app/Contents/MacOS/maple-agent" ]; then
+     mkdir -p "$HOME/.local/bin" &&
+       ln -sf "/Applications/Maple Agent.app/Contents/MacOS/maple-agent" "$HOME/.local/bin/maple-agent"
+   else
+     printf '%s\n' "Maple Work was not found in /Applications. Move it there and try again."
+   fi
+   ```
+
+   Buzz 1.0.3 searches `~/.local/bin` directly. Quit and reopen Buzz after
+   creating the link.
 2. In Buzz, open **Settings → Plugins → Manage plugins → Add**.
 3. Enter this repository URL and leave **Branch or tag** blank:
 
@@ -35,6 +48,8 @@ with the agent. Installing the plugin on a laptop runs Maple on that laptop.
 
 ## Requirements and limits
 
+- Checked with **Buzz desktop 1.0.3** and **Maple Work 0.0.24** on macOS 26 (Apple Silicon):
+  install, direct and channel mentions, follow-ups, file reads and writes.
 - Checked with **Buzz desktop 1.0.0 and 1.0.1** and **Maple Work 0.0.23 build 950** on Linux.
   Other versions/platforms have not yet been validated for this plugin.
 - A Linux desktop upgrade to **Buzz 1.0.3** retained the enabled Maple plugin
