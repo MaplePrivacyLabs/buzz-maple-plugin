@@ -15,12 +15,16 @@ fully stress-tested integration.
    if `which maple-agent` prints nothing in Terminal, run:
 
    ```sh
-   mkdir -p ~/.local/bin
-   ln -sf "/Applications/Maple Agent.app/Contents/MacOS/maple-agent" ~/.local/bin/maple-agent
-   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+   if [ -x "/Applications/Maple Agent.app/Contents/MacOS/maple-agent" ]; then
+     mkdir -p "$HOME/.local/bin" &&
+       ln -sf "/Applications/Maple Agent.app/Contents/MacOS/maple-agent" "$HOME/.local/bin/maple-agent"
+   else
+     printf '%s\n' "Maple Work was not found in /Applications. Move it there and try again."
+   fi
    ```
 
-   Then quit and reopen Buzz.
+   Buzz 1.0.3 searches `~/.local/bin` directly. Quit and reopen Buzz after
+   creating the link.
 2. In Buzz, open **Settings → Plugins → Manage plugins → Add**.
 3. Enter this repository URL and leave **Branch or tag** blank:
 
